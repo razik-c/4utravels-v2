@@ -4,13 +4,13 @@ import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaOptionsType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 
 type Slide = {
   title: string;
   cta: string;
   img: string;
-  bg?: string; 
+  bg?: string;
 };
 
 const slides: Slide[] = [
@@ -34,7 +34,6 @@ const slides: Slide[] = [
   },
 ];
 
-
 const OPTIONS: EmblaOptionsType = {
   loop: false,
   align: "start",
@@ -42,9 +41,11 @@ const OPTIONS: EmblaOptionsType = {
 };
 
 export default function MobilePromoCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS, [
-    Autoplay({ delay: 35000, stopOnInteraction: false }),
-  ]);
+  // ✅ memoize the plugin instance so TS knows it's valid
+  const autoplay = useMemo(() => Autoplay({ delay: 3500, stopOnInteraction: false }), []);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS, [autoplay]);
+
   const [selected, setSelected] = useState(0);
   const [snapCount, setSnapCount] = useState(0);
 
@@ -71,13 +72,9 @@ export default function MobilePromoCarousel() {
       <div className="px-3 h-[170px] overflow-x-hidden" ref={emblaRef}>
         <div className="flex gap-3 ml-3">
           {slides.map((s, i) => (
-            <Linkrticle
+            <article
               key={i}
-              className="
-    min-w-[95%] md:min-w-[60%]
-    rounded-2xl shadow-sm
-    bg-gradient-to-r mx-1 
-  "
+              className="min-w-[95%] md:min-w-[60%] rounded-2xl shadow-sm bg-gradient-to-r mx-1"
             >
               <div
                 className={`relative flex h-40 sm:h-48 items-stretch overflow-hidden rounded-xl bg-gradient-to-r ${
@@ -94,7 +91,7 @@ export default function MobilePromoCarousel() {
                   </h3>
                   <button
                     className="mt-3 inline-flex h-9 justify-center items-center rounded-full text-sm font-medium
-                   text-white bg-[#35039A] hover:bg-[#35039A]/20 text-center transition-colors shadow"
+                      text-white bg-[#35039A] hover:bg-[#35039A]/90 text-center transition-colors shadow"
                     onClick={() => scrollTo((i + 1) % slides.length)}
                     aria-label={s.cta}
                   >
@@ -105,7 +102,7 @@ export default function MobilePromoCarousel() {
                 <div className="relative ml-auto h-full w-[42%]">
                   <Image
                     src={s.img}
-                    alt=""
+                    alt={s.title.replace(/\n/g, " ")}
                     fill
                     className="object-cover object-center"
                     priority={i === 0}
