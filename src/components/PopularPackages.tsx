@@ -8,13 +8,13 @@ import Link from 'next/link';
 import ButtonPrimary from '@/components/ButtonPrimary';
 import ButtonSecondary from '@/components/ButtonSecondary';
 
-type Tour = {
+export type Tour = {
   slug: string;
-  heroImage?: string | null;
   title: string;
-  priceAED?: number | string;
-  shortDescription?: string;
-  isFeatured?: boolean;
+  shortDescription?: string | null;   // ← allow null
+  heroImage?: string | null;          // ← allow null
+  priceAED?: number | string | null;  // ← allow null
+  isFeatured?: boolean | null;        // ← allow null
 };
 
 export default function PopularPackagesCarousel({
