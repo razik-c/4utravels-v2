@@ -14,6 +14,7 @@ import { IoIosBed } from "react-icons/io";
 import ProductGallery, { GalleryImage } from "@/components/ProductsGallery";
 import Itinerary, { ItineraryItem } from "@/components/Itinerary";
 import EnquiryForm from "@/components/EnquiryForm";
+import Link from "next/link";
 
 type Tour = typeof tourPackages.$inferSelect;
 
@@ -126,11 +127,11 @@ export default async function TourPage({
       {/* Breadcrumb */}
       <nav className="px-4 text-sm text-black/60 mb-4">
         <span className="hover:underline">
-          <a href="/">Home</a>
+          <Link href="/">Home</Link>
         </span>
         <span className="mx-2">/</span>
         <span className="hover:underline">
-          <a href="/tours">Tours</a>
+          <Link href="/tours">Tours</Link>
         </span>
         <span className="mx-2">/</span>
         <span className="text-black">{tour.title}</span>

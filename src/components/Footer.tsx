@@ -27,7 +27,7 @@ export default function Footer() {
 
             <ul className="flex justify-center gap-6 !mt-8 md:gap-8 sm:justify-start">
               <li>
-                <a
+                <Link
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -35,10 +35,10 @@ export default function Footer() {
                 >
                   <FaFacebookF className="w-5 h-5" />
                   <span className="sr-only">Facebook</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -46,10 +46,10 @@ export default function Footer() {
                 >
                   <FaInstagram className="w-5 h-5" />
                   <span className="sr-only">Instagram</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -57,10 +57,10 @@ export default function Footer() {
                 >
                   <FaTwitter className="w-5 h-5" />
                   <span className="sr-only">Twitter</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -68,7 +68,7 @@ export default function Footer() {
                 >
                   <FaYoutube className="w-5 h-5" />
                   <span className="sr-only">YouTube</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -196,21 +196,21 @@ export default function Footer() {
               <ul className="!mt-8 !space-y-4 text-sm">
                 <li className="flex items-start justify-start sm:justify-start gap-1.5">
                   <MdEmail className="w-4 h-4 text-black" />
-                  <a
+                  <Link
                     href="mailto:info@4utravels.com"
                     className="!text-black hover:!text-black/75 no-underline"
                   >
                     info@4utravels.com
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-center justify-start sm:justify-start gap-1.5">
                   <MdPhone className="w-4 h-4 text-black" />
-                  <a
+                  <Link
                     href="tel:+971500000000"
                     className="!text-black hover:!text-black/75 no-underline"
                   >
                     +971 50 000 0000
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-start justify-start sm:justify-start gap-1.5">
                   <MdLocationOn className="w-4 h-4 text-black mt-0.5" />

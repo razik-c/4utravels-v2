@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
 
-type AnyPlace = Record<string, any>;
+type AnyPlace = Record<string, unknown>;
 
 function pick<T = string>(obj: AnyPlace, keys: string[], fallback?: T): T | undefined {
   for (const k of keys) {

@@ -71,7 +71,7 @@ export default function MobilePromoCarousel() {
       <div className="px-3 h-[170px] overflow-x-hidden" ref={emblaRef}>
         <div className="flex gap-3 ml-3">
           {slides.map((s, i) => (
-            <article
+            <Linkrticle
               key={i}
               className="
     min-w-[95%] md:min-w-[60%]

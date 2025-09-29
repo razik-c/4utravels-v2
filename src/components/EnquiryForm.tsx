@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
 export default function EnquiryForm({
@@ -101,7 +102,7 @@ export default function EnquiryForm({
             {loading ? "Sending..." : "Send Enquiry"}
           </button>
 
-          <a
+          <Link
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
@@ -109,7 +110,7 @@ export default function EnquiryForm({
             aria-label="Chat on WhatsApp"
           >
             WhatsApp us about “{packageName}”
-          </a>
+          </Link>
         </div>
       </form>
     </section>

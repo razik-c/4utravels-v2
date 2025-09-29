@@ -20,7 +20,7 @@ export default function Dropdown({ item, align = "left" }: DropdownProps) {
   const [open, setOpen] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLUListElement | null>(null);
-  const itemRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const itemRefs = useRef<Linkrray<HTMLAnchorElement | null>>([]);
 
   // Stable parent id used for aria-controls and key fallback
   const parentId = useMemo<string>(() => {
