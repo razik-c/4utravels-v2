@@ -9,11 +9,8 @@ import ButtonPrimary from "@/components/ButtonPrimary";
 import ButtonSecondary from "@/components/ButtonSecondary";
 import { FaCalendar, FaLocationDot } from "react-icons/fa6";
 import { IoIosBed } from "react-icons/io";
-
-// NEW: import the pieces (use the versions I sent you)
 import ProductGallery, { GalleryImage } from "@/components/ProductsGallery";
 import Itinerary, { ItineraryItem } from "@/components/Itinerary";
-import EnquiryForm from "@/components/EnquiryForm";
 import Link from "next/link";
 
 type Tour = typeof tourPackages.$inferSelect;
@@ -22,16 +19,18 @@ export const revalidate = 60;
 
 // ----- Helpers
 async function getTour(slug: string): Promise<Tour | null> {
+  console.log("Fetching tour for slug:", slug);
   const rows = await db
     .select()
     .from(tourPackages)
     .where(eq(tourPackages.slug, slug))
     .limit(1);
 
+  console.log("Rows:", rows);
   return rows[0] ?? null;
 }
 
-// Prebuild known slugs (optional, speeds up prod)
+// Prebuild known slugs
 export async function generateStaticParams() {
   const rows = await db
     .select({ slug: tourPackages.slug })
@@ -40,13 +39,14 @@ export async function generateStaticParams() {
   return rows.map((r) => ({ slug: r.slug }));
 }
 
-// Dynamic SEO
+// ✅ Dynamic SEO
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const tour = await getTour(params.slug);
+  const { slug } = await params;
+  const tour = await getTour(slug);
   if (!tour) return { title: "Tour not found" };
 
   return {
@@ -60,20 +60,18 @@ export async function generateMetadata({
   };
 }
 
-// --- small safe parsers (in case you add JSON cols later)
+// --- safe parsers
 function parseItinerary(raw?: unknown, durationDays?: number): ItineraryItem[] {
-  // If you store itinerary JSON in your table later (e.g. tour.itineraryJson), parse it here.
-  const json = typeof raw === "string" ? safeJson(raw) : raw;
-  if (Array.isArray(json)) {
-    return json
-      .map((d, i) => ({
+  try {
+    const json = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (Array.isArray(json)) {
+      return json.map((d, i) => ({
         day: Number(d.day ?? i + 1),
         title: String(d.title ?? `Day ${i + 1}`),
         description: String(d.description ?? ""),
-      }))
-      .filter((x) => Number.isFinite(x.day) && x.title);
-  }
-  // Fallback: create a minimal itinerary from duration
+      }));
+    }
+  } catch {}
   const days = Math.max(1, Number(durationDays ?? 1));
   return Array.from({ length: days }, (_, i) => ({
     day: i + 1,
@@ -82,28 +80,22 @@ function parseItinerary(raw?: unknown, durationDays?: number): ItineraryItem[] {
   }));
 }
 
-function safeJson(str: string) {
-  try {
-    return JSON.parse(str);
-  } catch {
-    return null;
-  }
-}
-
 function buildGallery(tour: Tour): GalleryImage[] {
-  // If later you add more images columns/JSON, push them here.
   const list: GalleryImage[] = [];
   if (tour.heroImage) list.push({ src: tour.heroImage, alt: tour.title });
-  // Example: if you add JSON field tour.galleryJson
-  // @ts-expect-error dynamic field (optional)
-  const more = tour.galleryJson ? safeJson(tour.galleryJson) : null;
+
+  const more =
+    typeof (tour as any).galleryJson === "string"
+      ? JSON.parse((tour as any).galleryJson)
+      : null;
+
   if (Array.isArray(more)) {
     for (const m of more) {
       if (m?.src)
         list.push({ src: String(m.src), alt: String(m.alt ?? tour.title) });
     }
   }
-  // Hard fallback to a stock image if completely empty
+
   if (list.length === 0) list.push({ src: "/tour.jpg", alt: tour.title });
   return list;
 }
@@ -117,10 +109,11 @@ export default async function TourPage({
   const tour = await getTour(params.slug);
   if (!tour) notFound();
 
-  // Map DB → components
   const gallery = buildGallery(tour);
-  // @ts-expect-error dynamic field (optional)
-  const itineraryItems = parseItinerary(tour.itineraryJson, tour.durationDays);
+  const itineraryItems = parseItinerary(
+    (tour as any).itineraryJson,
+    tour.durationDays ?? undefined
+  );
 
   return (
     <main className="md:container py-8 md:py-12">
@@ -166,20 +159,18 @@ export default async function TourPage({
 
       {/* Main content */}
       <section className="mt-8 grid grid-cols-12 gap-8 px-4">
-        {/* Left: details (kept same UI) */}
         <div className="col-span-12 md:col-span-8">
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="mt-3 leading-relaxed text-black/80 whitespace-pre-line">
             {tour.longDescription || tour.shortDescription}
           </p>
 
-          {/* Itinerary (new section, but style keeps your overall structure) */}
           <div className="mt-8">
             <Itinerary items={itineraryItems} />
           </div>
         </div>
 
-        {/* Right: booking card (kept same UI, added WhatsApp CTA) */}
+        {/* Booking card */}
         <aside className="col-span-12 md:col-span-4">
           <div className="rounded-lg border border-gray-200 p-5 shadow-sm sticky top-24">
             <div className="text-sm uppercase text-black/60">Starting from</div>
@@ -210,7 +201,6 @@ export default async function TourPage({
                 className="w-full !justify-center rounded-md"
                 text={"Whatsapp Enquiry"}
               />
-              {/* WhatsApp CTA with package name */}
             </div>
 
             <div className="mt-6 text-sm text-black/80 flex flex-col space-y-2">
@@ -223,27 +213,22 @@ export default async function TourPage({
 
               {tour.location && (
                 <div className="flex items-center justify-between">
-                  <span className="w-full">Location</span>
+                  <span>Location</span>
                   <span className="font-medium text-end">{tour.location}</span>
                 </div>
               )}
-
             </div>
           </div>
         </aside>
       </section>
 
-      {/* Enquiry anchor target (kept your UI, swapped button for real form submit + WA exists above) */}
+      {/* Enquiry form */}
       <div id="enquire" className="mt-12 px-4">
         <h2 className="text-xl font-semibold">Enquire about this tour</h2>
         <p className="text-black/70 mt-2">
           Send us a message and our team will get back to you with availability
           and the best rates.
         </p>
-
-        {/* Keep your look; you can replace with <EnquiryForm /> if you want the WA-prefill & validation */}
-        {/* <EnquiryForm packageName={tour.title} whatsAppNumber={process.env.NEXT_PUBLIC_WA_NUMBER} className="mt-4" /> */}
-
         <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             className="border border-gray-300 rounded px-3 py-2"

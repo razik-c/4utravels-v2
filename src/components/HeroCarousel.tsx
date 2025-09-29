@@ -3,7 +3,6 @@
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaOptionsType } from "embla-carousel";
-import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState, useMemo } from "react";
 
 type Slide = {
@@ -41,10 +40,8 @@ const OPTIONS: EmblaOptionsType = {
 };
 
 export default function MobilePromoCarousel() {
-  // ✅ memoize the plugin instance so TS knows it's valid
-  const autoplay = useMemo(() => Autoplay({ delay: 3500, stopOnInteraction: false }), []);
 
-  const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS, [autoplay]);
+  const [emblaRef, emblaApi] = useEmblaCarousel(OPTIONS);
 
   const [selected, setSelected] = useState(0);
   const [snapCount, setSnapCount] = useState(0);

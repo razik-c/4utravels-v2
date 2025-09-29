@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
-import type { EmblaCarouselType } from "embla-carousel";
+import useEmblaCarousel from "embla-carousel-react";
+import type { EmblaCarouselType, EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 import clsx from "clsx";
 
@@ -18,26 +18,25 @@ export default function ProductGallery({
   images: GalleryImage[];
   className?: string;
 }) {
-  // Use the React wrapper's options type
-  const mainOptions: UseEmblaCarouselType["options"] = {
-    loop: false,
-    align: "start",
-    containScroll: "trimSnaps",
-  };
 
-  const thumbsOptions: UseEmblaCarouselType["options"] = {
+  const mainOptions = {
+  loop: false,
+  align: "start",
+  containScroll: "trimSnaps",
+};
+const [emblaMainRef, emblaMainApi] = useEmblaCarousel(mainOptions);
+
+  const thumbsOptions: EmblaOptionsType = {
     dragFree: true,
     containScroll: "trimSnaps",
     align: "start",
   };
 
-  // Main & thumbs carousels
-  const [emblaMainRef, emblaMainApi] = useEmblaCarousel(mainOptions);
+
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel(thumbsOptions);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Keep selected index in sync and keep the selected thumb in view
   const onSelect = useCallback(
     (api: EmblaCarouselType | undefined) => {
       if (!api) return;
@@ -48,26 +47,21 @@ export default function ProductGallery({
     [emblaThumbsApi]
   );
 
-  // Wire up listeners with cleanup
   useEffect(() => {
     if (!emblaMainApi) return;
 
     const handler = () => onSelect(emblaMainApi);
-
-    // initialize state immediately
     handler();
 
     emblaMainApi.on("select", handler);
     emblaMainApi.on("reInit", handler);
 
     return () => {
-      // .off exists on Embla v7+
       emblaMainApi.off?.("select", handler);
       emblaMainApi.off?.("reInit", handler);
     };
   }, [emblaMainApi, onSelect]);
 
-  // Jump from thumb → main
   const scrollTo = (idx: number) => emblaMainApi?.scrollTo(idx);
 
   return (
