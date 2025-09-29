@@ -174,7 +174,7 @@ export default async function TourPage({
         <aside className="col-span-12 md:col-span-4">
           <div className="rounded-lg border border-gray-200 p-5 shadow-sm sticky top-24">
             <div className="text-sm uppercase text-black/60">Starting from</div>
-            <div className="text-2xl font-bold mt-1">AED {tour.priceAED}</div>
+            <div className="text-2xl font-bold mt-1">AED {Number(tour.priceAED).toFixed(2)}</div>
 
             {tour.isFeatured && (
               <div className="mt-2 inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded">
